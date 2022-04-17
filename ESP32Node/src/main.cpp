@@ -7,10 +7,10 @@
 
 bool state = true;
 
-const char *ssid = "*";
-const char *password = "*";
+const char *ssid = WIFI_NAME;
+const char *password = WIFI_PASSWORD;
 
-const char *mqtt_server = "*";
+const char *mqtt_server = MQTT_SERVER_IP;
 
 WiFiClient espClient;
 PubSubClient client(espClient);
