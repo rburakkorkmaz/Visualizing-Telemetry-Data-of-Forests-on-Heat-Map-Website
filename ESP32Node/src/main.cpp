@@ -2,6 +2,7 @@
 #include <WiFi.h>
 #include <MyConfig.h>
 #include <PubSubClient.h>
+#include <DallasTemperature.h>
 #include <Wire.h>
 #include "DHT.h"
 
@@ -19,11 +20,61 @@ char msg[50];
 int value = 0;
 
 #define DHTPIN 4
-#define DHTTYPE DHT11
+//#define DHTTYPE DHT11
 
 const int ledPin = 2;
 
-DHT dht(DHTPIN, DHTTYPE);
+float readTemperatureSensor(int sensorPin, bool shouldPrint){
+  OneWire oneWire(sensorPin);
+  DallasTemperature sensors(&oneWire);
+
+  sensors.begin();
+
+  sensors.requestTemperatures();
+
+  float tempC = sensors.getTempCByIndex(0);
+
+  if(tempC != DEVICE_DISCONNECTED_C && shouldPrint) 
+  {
+    Serial.print("Temperature for the device 1 (index 0) is: ");
+    Serial.println(tempC);
+  }
+
+  return tempC;
+}
+
+
+float readHumiditySensor(int sensorPin, const uint8_t DHTTYPE, bool shouldPrint)
+{
+  DHT dht(sensorPin, DHTTYPE);
+
+  dht.begin();
+
+  float h = dht.readHumidity();
+
+  // char tempString[8];
+  // dtostrf(h, 1, 2, tempString);
+  if (shouldPrint)
+  {
+    Serial.print(F("Humidity: "));
+    Serial.println(h);
+  }
+
+  return h;
+}
+
+float readMoistureSensor(int sensorPin, bool shouldPrint)
+{
+  int adcValue = 0;
+
+  adcValue = analogRead(sensorPin);
+  if (shouldPrint)
+  {
+    Serial.print("Moisture value: ");
+    Serial.println(adcValue);
+  }
+  return adcValue;
+}
 
 void setup_wifi()
 {
@@ -113,9 +164,7 @@ void setup()
   setup_wifi();
   client.setServer(mqtt_server, 1883);
   client.setCallback(callback);
-  Serial.println(F("DHTxx test!"));
   pinMode(ledPin, OUTPUT);
-  dht.begin();
 }
 
 void loop()
@@ -134,15 +183,11 @@ void loop()
       lastMsg = now;
 
       // Temperature in Celsius
-      float h = dht.readHumidity();
+      readTemperatureSensor(5, true);
+      readHumiditySensor(4, DHT11, true);
+      readMoistureSensor(34, true);
 
-      // Convert the value to a char array
-      char tempString[8];
-      dtostrf(h, 1, 2, tempString);
-      Serial.print(F("Humidity: "));
-      Serial.println(h);
-
-      client.publish("esp32/sensorData", tempString);
+      // client.publish("esp32/sensorData", tempString);
     }
   }
   else
