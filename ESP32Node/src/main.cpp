@@ -1,12 +1,13 @@
 #include <Arduino.h>
 #include <WiFi.h>
+#include <MyConfig.h>
 #include <PubSubClient.h>
 #include <Wire.h>
 #include "DHT.h"
 
 bool state = true;
 
-const char *ssid = "*"";
+const char *ssid = "*";
 const char *password = "*";
 
 const char *mqtt_server = "*";
