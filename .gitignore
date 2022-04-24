@@ -135,5 +135,6 @@ dmypy.json
 .vscode/launch.json
 .vscode/ipch
 
-# Password file
+# Config related files
 MyConfig.h
+config/
