@@ -19,12 +19,20 @@ long lastMsg = 0;
 char msg[50];
 int value = 0;
 
+// Sensor readings variables
+float temperature;
+float humidity;
+float moisture;
+float pressure;
+int light;
+
 #define DHTPIN 4
 //#define DHTTYPE DHT11
 
 const int ledPin = 2;
 
-float readTemperatureSensor(int sensorPin, bool shouldPrint){
+float readTemperatureSensor(int sensorPin, bool shouldPrint)
+{
   OneWire oneWire(sensorPin);
   DallasTemperature sensors(&oneWire);
 
@@ -34,7 +42,7 @@ float readTemperatureSensor(int sensorPin, bool shouldPrint){
 
   float tempC = sensors.getTempCByIndex(0);
 
-  if(tempC != DEVICE_DISCONNECTED_C && shouldPrint) 
+  if (tempC != DEVICE_DISCONNECTED_C && shouldPrint)
   {
     Serial.print("Temperature for the device 1 (index 0) is: ");
     Serial.println(tempC);
@@ -43,7 +51,6 @@ float readTemperatureSensor(int sensorPin, bool shouldPrint){
   return tempC;
 }
 
-
 float readHumiditySensor(int sensorPin, const uint8_t DHTTYPE, bool shouldPrint)
 {
   DHT dht(sensorPin, DHTTYPE);
@@ -51,16 +58,20 @@ float readHumiditySensor(int sensorPin, const uint8_t DHTTYPE, bool shouldPrint)
   dht.begin();
 
   float h = dht.readHumidity();
-
-  // char tempString[8];
-  // dtostrf(h, 1, 2, tempString);
-  if (shouldPrint)
+  if (!isnan(h))
   {
-    Serial.print(F("Humidity: "));
-    Serial.println(h);
-  }
+    if (shouldPrint)
+    {
+      Serial.print(F("Humidity: "));
+      Serial.println(h);
+    }
 
-  return h;
+    return h;
+  }
+  else
+  {
+    return (float)-2;
+  }
 }
 
 float readMoistureSensor(int sensorPin, bool shouldPrint)
@@ -68,6 +79,7 @@ float readMoistureSensor(int sensorPin, bool shouldPrint)
   int adcValue = 0;
 
   adcValue = analogRead(sensorPin);
+
   if (shouldPrint)
   {
     Serial.print("Moisture value: ");
@@ -178,16 +190,25 @@ void loop()
   if (state)
   {
     long now = millis();
-    if (now - lastMsg > 1000)
+    if (now - lastMsg > 3000)
     {
       lastMsg = now;
 
       // Temperature in Celsius
-      readTemperatureSensor(5, true);
-      readHumiditySensor(4, DHT11, true);
-      readMoistureSensor(34, true);
+      // temperature = readTemperatureSensor(5, true);
+      temperature = 32.23;
+      humidity = readHumiditySensor(4, DHT11, true);
+      moisture = readMoistureSensor(34, true);
+      pressure = 25.32;
+      light = 1;
 
-      // client.publish("esp32/sensorData", tempString);
+      // Concatenating sensor readings
+      char strToSend[100];
+      snprintf(strToSend, 100, "%.2f;%.2f;%.2f;%.2f;%d;", temperature, humidity, moisture, pressure, light);
+
+      Serial.print("Message sent: ");
+      Serial.println(strToSend);
+      client.publish(MQTT_NODE_TOPIC, strToSend);
     }
   }
   else
