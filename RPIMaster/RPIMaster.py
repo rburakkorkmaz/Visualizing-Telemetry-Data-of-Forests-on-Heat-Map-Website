@@ -58,24 +58,40 @@ def convert_to_json(data: str, client_id: str)-> json:
 
 # The callback for when the client receives a CONNACK response from the server.
 def on_connect(client, userdata, flags, rc):
-    print("Connected with result code "+str(rc))
-    #print(f"Client: {client._client_id}")
-    
+    #print("Connected with result code "+str(rc))
     client_id = client._client_id.decode('utf-8')
+    print(f"Client: {client_id}")
     # Subscribe data topic
-    client.subscribe(sensor_data_topic + "_" + client_id)
+    if client_id == "AWS_CLIENT":
+       client.subscribe("AWS_CONTROL")
+    else:
+       client.subscribe(sensor_data_topic + "_" + client_id)
 
 # The callback for when a PUBLISH message is received from the server.
 def on_message(client, userdata, msg):
+    global clients
+
+
     topic = msg.topic
-    message = msg.payload.decode('utf-8')
-    client_id = client._client_id.decode('utf-8')
+    message = str(msg.payload, 'utf-8')
+    client_id = str(client._client_id,'utf-8')
+    #print(f"Topic: {topic}")
+    #print(f"Message: {message}")
+    if client_id == "AWS_CLIENT":
+       message_arr = message.split(';')
+       print("Toggling: ", end="")
+       for node in message_arr:
+          clients[node]["State"] = not clients[node]["State"]
+          print(f"{node}")
+    elif clients[client_id]["State"]:
+       aws_send_json = convert_to_json(message, client_id)
+       aws_client.publish("AWS_DATA", aws_send_json)
 
-    print(f"Topic: {topic}")
-    print(f"Message: {message}")
 
-    aws_send_json = convert_to_json(message, client_id)
-    aws_client.publish("testTopic", aws_send_json)
+# The disconnect callback for slaves.
+def on_disconnect(client, userdata, rc):
+    global clients
+    clients[client] = not clients[client]
 
 
 # AWS IoT Core MQTT Client
@@ -87,24 +103,31 @@ aws_client.tls_set(AWS_CONFIG.ROOT_CA,
                    tls_version = ssl.PROTOCOL_TLSv1_2,
                    ciphers = None)
 
+
+aws_client.on_connect = on_connect
+aws_client.on_message = on_message
 aws_client.connect(AWS_CONFIG.MQTT_URL, port=8883, keepalive=60)
-clients = []
+aws_client.loop_start()
+
+clients = {}
 for i in range(1, int(args.NUMBER_OF_SLAVES)+1):
-   clients.append(mqtt.Client(f"node_{i}",protocol=mqtt.MQTTv31))
+   clients[f"node_{i}"] = {"Client":mqtt.Client(f"node_{i}",protocol=mqtt.MQTTv31),
+                           "State": True} 
 
-for client in clients:
+for client in clients.values():
    #print(client._client_id)
-   client.on_connect = on_connect
-   client.on_message = on_message
-
+   client["Client"].on_connect = on_connect
+   client["Client"].on_message = on_message
+   client["Client"].on_disconnect = on_disconnect
    # Connect to the given IP address
-   client.connect("192.168.1.34", 1883, 60)
+   client["Client"].connect("192.168.1.34", 1883, 60)
 
    # Loop forever
-   client.loop_start()
+   client["Client"].loop_start()
 
 
 while True:
     print("Code RUNNING")
     # aws_client.publish("testTopic", "deneme")
+    print(clients)
     time.sleep(5)
