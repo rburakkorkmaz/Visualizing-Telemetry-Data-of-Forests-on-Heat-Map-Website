@@ -190,14 +190,13 @@ void setup()
 
 void loop()
 {
-  /*
   if (!client.connected())
   {
     reconnect();
   }
   client.loop();
-  */
-  if (true)
+
+  if (state)
   {
     long now = millis();
     if (now - lastMsg > 3000)
