@@ -26,11 +26,19 @@ float moisture;
 float pressure;
 int light;
 
-#define DHTPIN 4
-//#define DHTTYPE DHT11
+#define TEMPERATURE_PIN 4
+#define DHTPIN 5
+#define MOISTURE_PIN 34
+
 
 const int ledPin = 2;
 
+// Random sensor data generator
+float generateRandomNumber(float start, float finish){
+  return (float) ((finish-start) * esp_random())/ UINT32_MAX;
+}
+
+// Temperature Sensor reader function
 float readTemperatureSensor(int sensorPin, bool shouldPrint)
 {
   OneWire oneWire(sensorPin);
@@ -44,13 +52,14 @@ float readTemperatureSensor(int sensorPin, bool shouldPrint)
 
   if (tempC != DEVICE_DISCONNECTED_C && shouldPrint)
   {
-    Serial.print("Temperature for the device 1 (index 0) is: ");
+    Serial.print("Temperature: ");
     Serial.println(tempC);
   }
 
   return tempC;
 }
 
+// Humidity sensor reader function
 float readHumiditySensor(int sensorPin, const uint8_t DHTTYPE, bool shouldPrint)
 {
   DHT dht(sensorPin, DHTTYPE);
@@ -74,6 +83,7 @@ float readHumiditySensor(int sensorPin, const uint8_t DHTTYPE, bool shouldPrint)
   }
 }
 
+// Moisture sensor reader function
 float readMoistureSensor(int sensorPin, bool shouldPrint)
 {
   int adcValue = 0;
@@ -124,8 +134,6 @@ void callback(char *topic, byte *message, unsigned int length)
   }
   Serial.println();
 
-  // Feel free to add more if statements to control more GPIOs with MQTT
-
   // If a message is received on the topic esp32/output, you check if the message is either "on" or "off".
   // Changes the output state according to the message
   if (String(topic) == "node/output")
@@ -174,6 +182,7 @@ void setup()
 {
   Serial.begin(9600);
   setup_wifi();
+  
   client.setServer(mqtt_server, 1883);
   client.setCallback(callback);
   pinMode(ledPin, OUTPUT);
@@ -194,13 +203,13 @@ void loop()
     {
       lastMsg = now;
 
-      // Temperature in Celsius
-      // temperature = readTemperatureSensor(5, true);
-      temperature = 32.23;
-      humidity = readHumiditySensor(4, DHT11, true);
-      moisture = readMoistureSensor(34, true);
-      pressure = 25.32;
-      light = 1;
+
+      // Reader sensor datas
+      temperature = readTemperatureSensor(TEMPERATURE_PIN, true);
+      humidity = readHumiditySensor(DHTPIN, DHT11, true);
+      moisture = readMoistureSensor(MOISTURE_PIN, true);
+      pressure = generateRandomNumber(10.0f, 50.0f);
+      light = generateRandomNumber(0.0f, 1.0f) <= 0.5f ? 0 : 1;
 
       // Concatenating sensor readings
       char strToSend[100];
