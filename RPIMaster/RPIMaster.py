@@ -12,7 +12,7 @@ import json
 import time
 from datetime import datetime
 import config.aws_mqtt_config as AWS_CONFIG
-
+from classes.AWSDatabase import AWSDatabase
 
 # Argparse package usage
 parser = argparse.ArgumentParser()
@@ -36,8 +36,11 @@ print(f"Data Topic: {sensor_data_topic + '_node_i'}")
 print(f"State topic: {ESP32_state_topic + '_node_i'}")
 print(f"Number of clients: {args.NUMBER_OF_SLAVES}")
 
+# Create AWSDatabase class object
+dynomoDB = AWSDatabase(table_name="RPIHeatMap")
 
-def convert_to_json(data: str, client_id: str)-> json:
+
+def convert_to_dict(data: str, client_id: str)-> json:
     # Split string with string ;
     splited_data = data.split(";")
     # Creating a dictionary so I can easily convert it to json
@@ -48,13 +51,13 @@ def convert_to_json(data: str, client_id: str)-> json:
                   "Moisture": splited_data[2],
                   "Pressure": splited_data[3],
 	          "Light": splited_data[4],
-                  "Date": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                  "Latitude": splited_data[5],
+                  "Longitude": splited_data[6],
+                  "Date": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
          }
     }
 
-    data_json = json.dumps(temp)
-    print(data_json)
-    return data_json
+    return temp
 
 # The callback for when the client receives a CONNACK response from the server.
 def on_connect(client, userdata, flags, rc):
@@ -84,8 +87,17 @@ def on_message(client, userdata, msg):
           clients[node]["State"] = not clients[node]["State"]
           print(f"{node}")
     elif clients[client_id]["State"]:
-       aws_send_json = convert_to_json(message, client_id)
-       aws_client.publish("AWS_DATA", aws_send_json)
+       aws_send_json = convert_to_dict(message, client_id)
+       temperature = aws_send_json[client_id]["Temperature"]
+       humidity = aws_send_json[client_id]["Humidity"]
+       moisture = aws_send_json[client_id]["Moisture"]
+       pressure = aws_send_json[client_id]["Pressure"]
+       light = aws_send_json[client_id]["Light"]
+       lat = aws_send_json[client_id]["Latitude"]
+       lng = aws_send_json[client_id]["Longitude"]
+
+       dynomoDB.put(client_id, temperature, humidity, moisture, pressure, light, lat, lng)
+       # aws_client.publish("AWS_DATA", aws_send_json)
 
 
 # The disconnect callback for slaves.
