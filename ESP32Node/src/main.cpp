@@ -5,6 +5,8 @@
 #include <DallasTemperature.h>
 #include <Wire.h>
 #include "DHT.h"
+#include <Adafruit_BMP085.h>
+#include <SPI.h>
 
 bool state = true;
 
@@ -29,23 +31,28 @@ int light;
 #define TEMPERATURE_PIN 4
 #define DHTPIN 5
 #define MOISTURE_PIN 34
+#define LIGHT_PIN 35
 
-
+#define LATITUDE 36.917608
+#define LONGITUDE 30.615581
 const int ledPin = 2;
 
+OneWire oneWire(TEMPERATURE_PIN);
+DallasTemperature sensors(&oneWire);
+
+DHT dht(DHTPIN, DHT11);
+
+Adafruit_BMP085 bmp;
+
 // Random sensor data generator
-float generateRandomNumber(float start, float finish){
-  return (float) ((finish-start) * esp_random())/ UINT32_MAX;
+float generateRandomNumber(float start, float finish)
+{
+  return (float)((finish - start) * esp_random()) / UINT32_MAX;
 }
 
 // Temperature Sensor reader function
-float readTemperatureSensor(int sensorPin, bool shouldPrint)
+float readTemperatureSensor(bool shouldPrint)
 {
-  OneWire oneWire(sensorPin);
-  DallasTemperature sensors(&oneWire);
-
-  sensors.begin();
-
   sensors.requestTemperatures();
 
   float tempC = sensors.getTempCByIndex(0);
@@ -60,11 +67,8 @@ float readTemperatureSensor(int sensorPin, bool shouldPrint)
 }
 
 // Humidity sensor reader function
-float readHumiditySensor(int sensorPin, const uint8_t DHTTYPE, bool shouldPrint)
+float readHumiditySensor(bool shouldPrint)
 {
-  DHT dht(sensorPin, DHTTYPE);
-
-  dht.begin();
 
   float h = dht.readHumidity();
   if (!isnan(h))
@@ -84,11 +88,11 @@ float readHumiditySensor(int sensorPin, const uint8_t DHTTYPE, bool shouldPrint)
 }
 
 // Moisture sensor reader function
-float readMoistureSensor(int sensorPin, bool shouldPrint)
+float readMoistureSensor(bool shouldPrint)
 {
   int adcValue = 0;
 
-  adcValue = analogRead(sensorPin);
+  adcValue = analogRead(MOISTURE_PIN);
 
   if (shouldPrint)
   {
@@ -96,6 +100,28 @@ float readMoistureSensor(int sensorPin, bool shouldPrint)
     Serial.println(adcValue);
   }
   return adcValue;
+}
+int readPressureSensor(bool shouldPrint)
+{
+  int pressure = bmp.readPressure();
+  if (shouldPrint)
+  {
+    Serial.print("Pressure: ");
+    Serial.print(pressure);
+    Serial.println(" Pa");
+  }
+
+  return pressure;
+}
+
+int readLightSensor(bool shouldPrint){
+  int light = analogRead(LIGHT_PIN) <= 1000 ? 0 : 1;
+  if (shouldPrint)
+  {
+    Serial.print("Light: ");
+    Serial.println(light);
+  }
+  return light;
 }
 
 void setup_wifi()
@@ -161,11 +187,11 @@ void reconnect()
   {
     Serial.print("Attempting MQTT connection...");
     // Attempt to connect
-    if (client.connect("ESP8266Client"))
+    if (client.connect(MQTT_CLIENT_ID))
     {
       Serial.println("connected");
       // Subscribe
-      client.subscribe("node/output");
+      // client.subscribe("node/output");
     }
     else
     {
@@ -182,20 +208,30 @@ void setup()
 {
   Serial.begin(9600);
   setup_wifi();
-  
+
   client.setServer(mqtt_server, 1883);
   client.setCallback(callback);
   pinMode(ledPin, OUTPUT);
+  sensors.begin();
+  dht.begin();
+  if (!bmp.begin())
+  {
+    Serial.println("Could not find a valid BMP085/BMP180 sensor, check wiring!");
+    while (1)
+    {
+    }
+  }
 }
 
 void loop()
 {
+  /*
   if (!client.connected())
   {
     reconnect();
   }
   client.loop();
-
+  */
   if (state)
   {
     long now = millis();
@@ -203,20 +239,25 @@ void loop()
     {
       lastMsg = now;
 
-
       // Reader sensor datas
-      temperature = readTemperatureSensor(TEMPERATURE_PIN, true);
-      humidity = readHumiditySensor(DHTPIN, DHT11, true);
-      moisture = readMoistureSensor(MOISTURE_PIN, true);
-      pressure = generateRandomNumber(10.0f, 50.0f);
-      light = generateRandomNumber(0.0f, 1.0f) <= 0.5f ? 0 : 1;
+      temperature = readTemperatureSensor(true);
+      humidity = readHumiditySensor(true);
+      moisture = readMoistureSensor(true);
+      pressure = readPressureSensor(true);
+      // temperature = generateRandomNumber(10.0f, 50.0f);
+      // humidity = generateRandomNumber(10.0f, 50.0f);
+      // moisture = generateRandomNumber(10.0f, 50.0f);
+      // pressure = generateRandomNumber(10.0f, 50.0f);
+      //light = generateRandomNumber(0.0f, 1.0f) <= 0.5f ? 0 : 1;
+      light = readLightSensor(true);
 
       // Concatenating sensor readings
       char strToSend[100];
-      snprintf(strToSend, 100, "%.2f;%.2f;%.2f;%.2f;%d;", temperature, humidity, moisture, pressure, light);
+      snprintf(strToSend, 100, "%s;%.2f;%.2f;%.2f;%d;%d;%.6f;%.6f", MQTT_CLIENT_ID, temperature, humidity, moisture, pressure, light, LATITUDE, LONGITUDE);
 
       Serial.print("Message sent: ");
       Serial.println(strToSend);
+      Serial.println(MQTT_NODE_TOPIC);
       client.publish(MQTT_NODE_TOPIC, strToSend);
     }
   }

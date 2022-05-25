@@ -10,9 +10,12 @@
             "includePath": [
                 "g:/Leveling/Yüksek Lisans/Year_1/IoT/Course Project/Visualizing-Telemetry-Data-of-Forests-on-Heat-Map-Website/ESP32Node/include",
                 "g:/Leveling/Yüksek Lisans/Year_1/IoT/Course Project/Visualizing-Telemetry-Data-of-Forests-on-Heat-Map-Website/ESP32Node/src",
-                "C:/Users/ramaz/.platformio/packages/framework-arduinoespressif32/libraries/Wire/src",
                 "C:/Users/ramaz/.platformio/packages/framework-arduinoespressif32/libraries/WiFi/src",
                 "g:/Leveling/Yüksek Lisans/Year_1/IoT/Course Project/Visualizing-Telemetry-Data-of-Forests-on-Heat-Map-Website/ESP32Node/lib/MyConfig",
+                "g:/Leveling/Yüksek Lisans/Year_1/IoT/Course Project/Visualizing-Telemetry-Data-of-Forests-on-Heat-Map-Website/ESP32Node/.pio/libdeps/esp32doit-devkit-v1/Adafruit BMP085 Library",
+                "g:/Leveling/Yüksek Lisans/Year_1/IoT/Course Project/Visualizing-Telemetry-Data-of-Forests-on-Heat-Map-Website/ESP32Node/.pio/libdeps/esp32doit-devkit-v1/Adafruit BusIO",
+                "C:/Users/ramaz/.platformio/packages/framework-arduinoespressif32/libraries/SPI/src",
+                "C:/Users/ramaz/.platformio/packages/framework-arduinoespressif32/libraries/Wire/src",
                 "g:/Leveling/Yüksek Lisans/Year_1/IoT/Course Project/Visualizing-Telemetry-Data-of-Forests-on-Heat-Map-Website/ESP32Node/.pio/libdeps/esp32doit-devkit-v1/DallasTemperature",
                 "g:/Leveling/Yüksek Lisans/Year_1/IoT/Course Project/Visualizing-Telemetry-Data-of-Forests-on-Heat-Map-Website/ESP32Node/.pio/libdeps/esp32doit-devkit-v1/OneWire",
                 "g:/Leveling/Yüksek Lisans/Year_1/IoT/Course Project/Visualizing-Telemetry-Data-of-Forests-on-Heat-Map-Website/ESP32Node/.pio/libdeps/esp32doit-devkit-v1/PubSubClient/src",
@@ -209,7 +212,6 @@
                 "C:/Users/ramaz/.platformio/packages/framework-arduinoespressif32/libraries/RainMaker/src",
                 "C:/Users/ramaz/.platformio/packages/framework-arduinoespressif32/libraries/SD/src",
                 "C:/Users/ramaz/.platformio/packages/framework-arduinoespressif32/libraries/SD_MMC/src",
-                "C:/Users/ramaz/.platformio/packages/framework-arduinoespressif32/libraries/SPI/src",
                 "C:/Users/ramaz/.platformio/packages/framework-arduinoespressif32/libraries/SPIFFS/src",
                 "C:/Users/ramaz/.platformio/packages/framework-arduinoespressif32/libraries/SimpleBLE/src",
                 "C:/Users/ramaz/.platformio/packages/framework-arduinoespressif32/libraries/Ticker/src",
@@ -218,7 +220,6 @@
                 "C:/Users/ramaz/.platformio/packages/framework-arduinoespressif32/libraries/WebServer/src",
                 "C:/Users/ramaz/.platformio/packages/framework-arduinoespressif32/libraries/WiFiClientSecure/src",
                 "C:/Users/ramaz/.platformio/packages/framework-arduinoespressif32/libraries/WiFiProv/src",
-                "C:/Users/ramaz/.platformio/packages/tool-unity",
                 ""
             ],
             "browse": {
@@ -226,9 +227,12 @@
                 "path": [
                     "g:/Leveling/Yüksek Lisans/Year_1/IoT/Course Project/Visualizing-Telemetry-Data-of-Forests-on-Heat-Map-Website/ESP32Node/include",
                     "g:/Leveling/Yüksek Lisans/Year_1/IoT/Course Project/Visualizing-Telemetry-Data-of-Forests-on-Heat-Map-Website/ESP32Node/src",
-                    "C:/Users/ramaz/.platformio/packages/framework-arduinoespressif32/libraries/Wire/src",
                     "C:/Users/ramaz/.platformio/packages/framework-arduinoespressif32/libraries/WiFi/src",
                     "g:/Leveling/Yüksek Lisans/Year_1/IoT/Course Project/Visualizing-Telemetry-Data-of-Forests-on-Heat-Map-Website/ESP32Node/lib/MyConfig",
+                    "g:/Leveling/Yüksek Lisans/Year_1/IoT/Course Project/Visualizing-Telemetry-Data-of-Forests-on-Heat-Map-Website/ESP32Node/.pio/libdeps/esp32doit-devkit-v1/Adafruit BMP085 Library",
+                    "g:/Leveling/Yüksek Lisans/Year_1/IoT/Course Project/Visualizing-Telemetry-Data-of-Forests-on-Heat-Map-Website/ESP32Node/.pio/libdeps/esp32doit-devkit-v1/Adafruit BusIO",
+                    "C:/Users/ramaz/.platformio/packages/framework-arduinoespressif32/libraries/SPI/src",
+                    "C:/Users/ramaz/.platformio/packages/framework-arduinoespressif32/libraries/Wire/src",
                     "g:/Leveling/Yüksek Lisans/Year_1/IoT/Course Project/Visualizing-Telemetry-Data-of-Forests-on-Heat-Map-Website/ESP32Node/.pio/libdeps/esp32doit-devkit-v1/DallasTemperature",
                     "g:/Leveling/Yüksek Lisans/Year_1/IoT/Course Project/Visualizing-Telemetry-Data-of-Forests-on-Heat-Map-Website/ESP32Node/.pio/libdeps/esp32doit-devkit-v1/OneWire",
                     "g:/Leveling/Yüksek Lisans/Year_1/IoT/Course Project/Visualizing-Telemetry-Data-of-Forests-on-Heat-Map-Website/ESP32Node/.pio/libdeps/esp32doit-devkit-v1/PubSubClient/src",
@@ -425,7 +429,6 @@
                     "C:/Users/ramaz/.platformio/packages/framework-arduinoespressif32/libraries/RainMaker/src",
                     "C:/Users/ramaz/.platformio/packages/framework-arduinoespressif32/libraries/SD/src",
                     "C:/Users/ramaz/.platformio/packages/framework-arduinoespressif32/libraries/SD_MMC/src",
-                    "C:/Users/ramaz/.platformio/packages/framework-arduinoespressif32/libraries/SPI/src",
                     "C:/Users/ramaz/.platformio/packages/framework-arduinoespressif32/libraries/SPIFFS/src",
                     "C:/Users/ramaz/.platformio/packages/framework-arduinoespressif32/libraries/SimpleBLE/src",
                     "C:/Users/ramaz/.platformio/packages/framework-arduinoespressif32/libraries/Ticker/src",
@@ -434,12 +437,11 @@
                     "C:/Users/ramaz/.platformio/packages/framework-arduinoespressif32/libraries/WebServer/src",
                     "C:/Users/ramaz/.platformio/packages/framework-arduinoespressif32/libraries/WiFiClientSecure/src",
                     "C:/Users/ramaz/.platformio/packages/framework-arduinoespressif32/libraries/WiFiProv/src",
-                    "C:/Users/ramaz/.platformio/packages/tool-unity",
                     ""
                 ]
             },
             "defines": [
-                "PLATFORMIO=50205",
+                "PLATFORMIO=60001",
                 "ARDUINO_ESP32_DEV",
                 "HAVE_CONFIG_H",
                 "MBEDTLS_CONFIG_FILE=\"mbedtls/esp_config.h\"",
